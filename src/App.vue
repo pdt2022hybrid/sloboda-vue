@@ -29,6 +29,7 @@
   width: 60%;
   background: rgb(29, 29, 29);
   border-radius: 40px;
+  filter: drop-shadow(20px 20px 5px rgba(0, 0, 0, 0.5));
 }
 
 nav {

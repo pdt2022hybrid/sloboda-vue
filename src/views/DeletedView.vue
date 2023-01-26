@@ -3,9 +3,7 @@
     <h1 class="title">Deleted Items</h1>
     <img alt="Vue logo" src="../assets/logo.png">
     <br>
-    <div class="outerDiv container">
-      <ItemComponent :completedList="true"/>
-    </div>
+    <ItemComponent :completedList="true"/>
   </div>
 </template>
 
