@@ -1,21 +1,19 @@
 <template>
   <div class="home">
     <h1 class="title">TODO List</h1>
-    <img alt="Vue logo" src="../assets/logo.png">
-    <br>
-    <ItemComponent :completedList="false"/>
+    <ListComponent :completedList="false"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 //import HelloWorld from '@/components/HelloWorld.vue'
-import ItemComponent from '@/components/ItemComponent.vue'
+import ListComponent from '@/components/ListComponent.vue'
 
 export default {
   name: 'HomeView',
   components: {
-    ItemComponent
+    ListComponent
   }
 }
 </script>
