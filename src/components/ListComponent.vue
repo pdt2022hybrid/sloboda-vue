@@ -1,4 +1,5 @@
 <template>
+    <h1 class="title">{{ this.store.getters.getListTitle(activeListId) }}</h1>
 
     <div v-if="!this.completedList" class="container" style="width: 55%;">
         <div class="row">
@@ -12,31 +13,28 @@
             </div>
             <button @click="add(this.input, this.inputDesc)" class="btn btn-primary btn-lg col-1">Add</button>
             <button @click="load()" class="btn btn-primary btn-lg col-2">Load Data</button>
-            <button @click="this.store.commit('set', []);" class="btn btn-danger btn-lg col-1">Reset</button>
+            <button @click="this.store.commit('listSet', this.activeListId, []);" class="btn btn-danger btn-lg col-1">Reset</button>
         </div>
     </div>
+    <h1 v-else class="subtitle">Completed Items</h1>
 
     <div class="outerDiv container">
         <div class="scrollDiv">
             <div v-for="value in list" :key="value.id">
                 <div v-if="value.completed == this.completedList" class="innerDiv container">
-                    <div  class="row">
+                    <div class="row">
                         <div class="col">
                             <h3 class="innerText">{{ value.id }}: {{ value.title }}</h3>
-                            <h5 v-if="value.userId != ''" class="innerText user">{{ value.userId }}</h5>
+                            <h5 v-if="value.description != ''" class="innerText user">{{ value.description }}</h5>
                         </div>
                         <div v-if="this.completedList" class="col-1" style="display: flex; justify-content: center; align-items: center;">
-                            <i @click="this.delete(value)" class="listButton delete bi bi-trash3"></i>
+                            <i @click="this.store.commit('itemDelete', this.activeListId, value);" class="listButton delete bi bi-trash3"></i>
                         </div>
                         <div class="col-1" style="display: flex; justify-content: center; align-items: center;">
-                            <i v-if="!this.completedList" @click="this.completed(value)" class="listButton check bi bi-check-circle"></i>
-                            <i v-else @click="this.completed(value)" class="check-true bi bi-check-circle-fill"></i>
+                            <i v-if="!this.completedList" @click="this.store.commit('itemCompleted', this.activeListId, value);" class="listButton check bi bi-check-circle"></i>
+                            <i v-else @click="this.store.commit('itemCompleted', this.activeListId, value);" class="check-true bi bi-check-circle-fill"></i>
                         </div>
                     </div>
-                    <!--<div v-else>
-                        <h3 class="innerText">{{ value.id }}: {{ value.title }}</h3>
-                        <h5 class="innerText user">{{ value.userId }}</h5>
-                    </div>-->
                 </div>
             </div>
         </div>
@@ -112,7 +110,9 @@ export default {
     data() {
         return {
             store: useStore(),
-            list: computed(() => this.store.state.list),
+            content: computed(() => this.store.state.content),
+            activeListId: 1,
+            list: computed(() => this.content[this.activeListId-1].list),
             input: '',
             inputDesc: ''
         }
@@ -127,11 +127,15 @@ export default {
             try {
                 await axios.get(url).then( (result) => {
                     let arr = [];
-                    for(let obj of result.data) { //Insert "User " before userId, local userId is used as description
-                        obj.userId = "User " + obj.userId;
-                        arr.push(obj);
+                    for(let obj of result.data) { //Insert "User " before userId and use as description
+                        arr.push({
+                            title: obj.title,
+                            description: "User " + obj.userId,
+                            id: obj.id,
+                            completed: obj.completed
+                        });
                     }
-                    this.store.commit('set', arr);
+                    this.store.commit('listSet', this.activeListId, arr);
                     console.log("Loaded data from " + url);
                 })
             } catch(e) {
@@ -140,21 +144,15 @@ export default {
         },
         add: function(title, desc = '') {
             if(title == '') return;
-            this.store.commit('add', 
+            this.store.commit('itemAdd', this.activeListId,
                 {
-                    "userId": desc,
-                    "id": this.list.length + 1,
-                    "title": title,
-                    "completed": false
+                    title: title,
+                    description: desc,
+                    id: this.list.length + 1,
+                    completed: false
                 }
             );
             this.input = ''; this.inputDesc = '';
-        },
-        completed: function(item) {
-            this.store.commit('completed', item);
-        },
-        delete: function(item) {
-            this.store.commit('delete', item);
         }
     }/*,
     async mounted() {

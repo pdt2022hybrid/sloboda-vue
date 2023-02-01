@@ -70,8 +70,13 @@ export default {
 
 .title {
   font-size: 60px;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 20px;
+} .subtitle {
+  font-size: 45px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #5c6774 !important;
 }
 
 .space {

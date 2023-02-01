@@ -1,7 +1,5 @@
 <template>
   <div class="about">
-    <h1 class="title">Completed Items</h1>
-    <div class="space"></div>
     <ListComponent :completedList="true"/>
   </div>
 </template>

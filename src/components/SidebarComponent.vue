@@ -13,9 +13,20 @@
       </div>
     </div>
   </div>
+    <div v-for="value in this.$store.content" :key="value.listId" class="row">
+      <p>{{ this.$store.getters.getListTitle(value.listId) }}</p>
+    </div>
+  
 </template>
 
 <style scoped>
+ul {
+  list-style-type: none;
+}
+p {
+  text-decoration: none;
+}
+
 .top {
   border-bottom: 1px solid #2c3e50;
 }
@@ -33,7 +44,14 @@
 </style>
 
 <script>
+import { useStore } from 'vuex'
+
 export default {
-  name: 'SidebarComponent'
+  name: 'SidebarComponent',
+  data() {
+    return {
+      store: useStore()
+    }
+  }
 }
 </script>

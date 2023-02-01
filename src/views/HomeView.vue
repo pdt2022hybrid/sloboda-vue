@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <h1 class="title">TODO List</h1>
     <ListComponent :completedList="false"/>
   </div>
 </template>
