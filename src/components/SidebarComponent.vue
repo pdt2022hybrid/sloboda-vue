@@ -3,7 +3,7 @@
     <img alt="Vue logo" src="../assets/logo.png">
   <h1><b>TODO Lists</b></h1>
   </div>
-  <div class="add container">
+  <div @click="this.$store.commit('addList');" class="add container">
     <div class="row">
       <div class="col-2">
         <i class="bi bi-plus-square-fill" style="font-size: 36px; padding-left: 30px;"></i>
@@ -13,20 +13,20 @@
       </div>
     </div>
   </div>
-    <div v-for="value in this.$store.content" :key="value.listId" class="row">
-      <p>{{ this.$store.getters.getListTitle(value.listId) }}</p>
+    <div v-for="value in this.$store.state.lists" :key="value.id" class="row">
+      <div class="col-2" style="margin-left: 0.5vw;">
+        <i class="edit bi bi-pencil-square"></i>
+      </div>
+      <div class="col">
+        <h4 @click="this.$store.state.activeList = value.id" :class="{ 'active': this.$store.state.activeList === value.id}" class="todolist">
+          {{ this.$store.getters.getListTitle(value.id) }}
+        </h4>
+      </div>
     </div>
   
 </template>
 
 <style scoped>
-ul {
-  list-style-type: none;
-}
-p {
-  text-decoration: none;
-}
-
 .top {
   border-bottom: 1px solid #2c3e50;
 }
@@ -37,8 +37,32 @@ p {
   border-bottom: 1px solid #2c3e50;
   user-select: none;
   cursor: pointer;
+  margin-bottom: 1vh;
 } .add:hover {
   color: #42b983;
+}
+
+.todolist {
+  text-align: left;
+ 
+  box-sizing: border-box;
+  color: #6f6f6f;
+  transition: 250ms;
+  cursor: pointer;
+} .todolist:hover {
+  color: #2c3e50;
+  font-size: 1.8rem;
+} .todolist.active {
+  color: #42b983;
+}
+
+.edit {
+  font-size: 1vw;
+  color: #6f6f6f;
+  transition: 250ms;
+  cursor: pointer;
+} .edit:hover {
+  color: #2c3e50;
 }
 
 </style>

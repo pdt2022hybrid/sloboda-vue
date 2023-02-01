@@ -13,7 +13,7 @@
             </div>
             <button @click="add(this.input, this.inputDesc)" class="btn btn-primary btn-lg col-1">Add</button>
             <button @click="load()" class="btn btn-primary btn-lg col-2">Load Data</button>
-            <button @click="this.store.commit('listSet', this.activeListId, []);" class="btn btn-danger btn-lg col-1">Reset</button>
+            <button @click="this.store.commit('setList', []);" class="btn btn-danger btn-lg col-1">Reset</button>
         </div>
     </div>
     <h1 v-else class="subtitle">Completed Items</h1>
@@ -21,18 +21,18 @@
     <div class="outerDiv container">
         <div class="scrollDiv">
             <div v-for="value in list" :key="value.id">
-                <div v-if="value.completed == this.completedList" class="innerDiv container">
+                <div v-if="value.listId == this.activeListId && value.completed == this.completedList" class="innerDiv container">
                     <div class="row">
                         <div class="col">
                             <h3 class="innerText">{{ value.id }}: {{ value.title }}</h3>
                             <h5 v-if="value.description != ''" class="innerText user">{{ value.description }}</h5>
                         </div>
                         <div v-if="this.completedList" class="col-1" style="display: flex; justify-content: center; align-items: center;">
-                            <i @click="this.store.commit('itemDelete', this.activeListId, value);" class="listButton delete bi bi-trash3"></i>
+                            <i @click="this.store.commit('delete', value);" class="listButton delete bi bi-trash3"></i>
                         </div>
                         <div class="col-1" style="display: flex; justify-content: center; align-items: center;">
-                            <i v-if="!this.completedList" @click="this.store.commit('itemCompleted', this.activeListId, value);" class="listButton check bi bi-check-circle"></i>
-                            <i v-else @click="this.store.commit('itemCompleted', this.activeListId, value);" class="check-true bi bi-check-circle-fill"></i>
+                            <i v-if="!this.completedList" @click="this.store.commit('completed', value);" class="listButton check bi bi-check-circle"></i>
+                            <i v-else @click="this.store.commit('completed', value);" class="check-true bi bi-check-circle-fill"></i>
                         </div>
                     </div>
                 </div>
@@ -49,6 +49,7 @@
     border-radius: 12px;
     color: #fff;
     flex-direction: row;
+    transition: 250ms;
 } .innerDiv:hover {
     background: rgb(56, 56, 56);
 }
@@ -59,6 +60,7 @@
     text-align: left;
     margin-left: 20px;
     word-wrap: break-word;
+    transition: 250ms;
 } .innerText:hover {
     text-decoration: underline;
     cursor: pointer;
@@ -72,6 +74,7 @@
     font-size: 36px;
     padding: auto;
     color: #aaa;
+    transition: 250ms;
 } .innerDiv:hover .listButton {
     color: #fff;
 }
@@ -87,6 +90,7 @@
     font-size: 36px;
     padding: auto;
     color: #4f4;
+    transition: 250ms;
 } .check-true:hover {
     color: #888;
     cursor: pointer;
@@ -110,18 +114,12 @@ export default {
     data() {
         return {
             store: useStore(),
-            content: computed(() => this.store.state.content),
-            activeListId: 1,
-            list: computed(() => this.content[this.activeListId-1].list),
+            activeListId: computed(() => this.store.state.activeList),
+            list: computed(() => this.store.state.todos),
             input: '',
             inputDesc: ''
         }
     },
-    /*computed: {
-        getList () {
-            return this.$store.state.list;
-        }
-    },*/
     methods: {
         load: async function(url = "https://jsonplaceholder.typicode.com/todos") { //optional url
             try {
@@ -132,10 +130,11 @@ export default {
                             title: obj.title,
                             description: "User " + obj.userId,
                             id: obj.id,
+                            listId: this.activeListId,
                             completed: obj.completed
                         });
                     }
-                    this.store.commit('listSet', this.activeListId, arr);
+                    this.store.commit('setList', arr);
                     console.log("Loaded data from " + url);
                 })
             } catch(e) {
@@ -143,15 +142,7 @@ export default {
             }
         },
         add: function(title, desc = '') {
-            if(title == '') return;
-            this.store.commit('itemAdd', this.activeListId,
-                {
-                    title: title,
-                    description: desc,
-                    id: this.list.length + 1,
-                    completed: false
-                }
-            );
+            this.store.commit('add', this.activeListId, title, desc, false);
             this.input = ''; this.inputDesc = '';
         }
     }/*,
