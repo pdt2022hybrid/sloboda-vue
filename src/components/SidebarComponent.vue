@@ -3,7 +3,7 @@
     <img alt="Vue logo" src="../assets/logo.png">
   <h1><b>TODO Lists</b></h1>
   </div>
-  <div @click="this.$store.commit('addList');" class="add container">
+  <div @click="this.$store.commit('createList');" class="add container">
     <div class="row">
       <div class="col-2">
         <i class="bi bi-plus-square-fill" style="font-size: 36px; padding-left: 30px;"></i>
@@ -13,6 +13,7 @@
       </div>
     </div>
   </div>
+  <div class="lists container">
     <div v-for="value in this.$store.state.lists" :key="value.id" class="row">
       <div class="col-2" style="margin-left: 0.5vw;">
         <i class="edit bi bi-pencil-square"></i>
@@ -23,6 +24,7 @@
         </h4>
       </div>
     </div>
+  </div>
   
 </template>
 
@@ -31,20 +33,26 @@
   border-bottom: 1px solid #2c3e50;
 }
 
+.lists {
+  padding-top: 1vh;
+  overflow-y: auto;
+  height: 66vh;
+}
+
 .add {
   padding-top: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid #2c3e50;
   user-select: none;
+  transition: 250ms;
   cursor: pointer;
-  margin-bottom: 1vh;
 } .add:hover {
   color: #42b983;
 }
 
 .todolist {
   text-align: left;
- 
+
   box-sizing: border-box;
   color: #6f6f6f;
   transition: 250ms;

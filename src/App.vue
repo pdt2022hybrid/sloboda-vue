@@ -24,7 +24,9 @@ export default {
 </script>
 
 <style>
+/*noinspection CssUnknownTarget*/
 @import 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css';
+/*noinspection CssUnknownTarget*/
 @import 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css';
 
 /*body {
@@ -83,25 +85,8 @@ export default {
   height: 58.4px;
 }
 
-.outerDiv {
-  padding: 30px 0px;
-  margin-top: 20px;
-  width: 60%;
-  background: rgb(29, 29, 29);
-  border-radius: 40px;
-  /*filter: drop-shadow(15px 20px 5px rgba(0, 0, 0, 0.5));*/
-  height: 70vh;
-  overflow: hidden;
-}
-.scrollDiv {
-  height: 100%;
-  overflow: scroll;
-  overflow-x: hidden;
-}
-
 nav {
-  padding: 10px;
-  padding-bottom: 20px;
+  padding: 10px 10px 20px;
 }
 
 nav a {

@@ -12,8 +12,8 @@
                 </div>
             </div>
             <button @click="add(this.input, this.inputDesc)" class="btn btn-primary btn-lg col-1">Add</button>
-            <button @click="load()" class="btn btn-primary btn-lg col-2">Load Data</button>
-            <button @click="this.store.commit('setList', []);" class="btn btn-danger btn-lg col-1">Reset</button>
+            <button @click="load(this.activeListId)" class="btn btn-primary btn-lg col-2">Load Data</button>
+            <button @click="this.store.commit('setList', {id: this.activeListId, list: []});" class="btn btn-danger btn-lg col-1">Reset</button>
         </div>
     </div>
     <h1 v-else class="subtitle">Completed Items</h1>
@@ -21,7 +21,7 @@
     <div class="outerDiv container">
         <div class="scrollDiv">
             <div v-for="value in list" :key="value.id">
-                <div v-if="value.listId == this.activeListId && value.completed == this.completedList" class="innerDiv container">
+                <div v-if="value.listId === this.activeListId && value.completed === this.completedList" class="innerDiv container">
                     <div class="row">
                         <div class="col">
                             <h3 class="innerText">{{ value.id }}: {{ value.title }}</h3>
@@ -43,8 +43,24 @@
 </template>
 
 <style>
+.outerDiv {
+  padding: 30px 0;
+  margin-top: 20px;
+  width: 60%;
+  background: rgb(29, 29, 29);
+  border-radius: 40px;
+  /*filter: drop-shadow(15px 20px 5px rgba(0, 0, 0, 0.5));*/
+  height: 70vh;
+  overflow: hidden;
+}
+.scrollDiv {
+  height: 100%;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
 .innerDiv {
-    padding: 5px 50px 5px 0px;
+    padding: 5px 50px 5px 0;
     width: 80%;
     border-radius: 12px;
     color: #fff;
@@ -56,7 +72,6 @@
 
 .innerText {
     justify-content: space-around;
-    padding: auto;
     text-align: left;
     margin-left: 20px;
     word-wrap: break-word;
@@ -72,7 +87,6 @@
 
 .listButton {
     font-size: 36px;
-    padding: auto;
     color: #aaa;
     transition: 250ms;
 } .innerDiv:hover .listButton {
@@ -88,7 +102,6 @@
 }
 .check-true {
     font-size: 36px;
-    padding: auto;
     color: #4f4;
     transition: 250ms;
 } .check-true:hover {
@@ -121,20 +134,20 @@ export default {
         }
     },
     methods: {
-        load: async function(url = "https://jsonplaceholder.typicode.com/todos") { //optional url
+        load: async function(list, start = false, url = "https://jsonplaceholder.typicode.com/todos") { //optional url
+            if(start && this.store.state.firstLoad) return;
             try {
                 await axios.get(url).then( (result) => {
-                    let arr = [];
+                    //let arr = [];
                     for(let obj of result.data) { //Insert "User " before userId and use as description
-                        arr.push({
+                      this.store.commit('add', {
+                            list: list,
                             title: obj.title,
-                            description: "User " + obj.userId,
-                            id: obj.id,
-                            listId: this.activeListId,
+                            desc: "User " + obj.userId,
                             completed: obj.completed
                         });
                     }
-                    this.store.commit('setList', arr);
+                    //this.store.commit('setList', {id: list, list: arr});
                     console.log("Loaded data from " + url);
                 })
             } catch(e) {
@@ -142,12 +155,13 @@ export default {
             }
         },
         add: function(title, desc = '') {
-            this.store.commit('add', this.activeListId, title, desc, false);
+            this.store.commit('add', { list: this.activeListId, title: title, desc: desc, completed: false });
             this.input = ''; this.inputDesc = '';
         }
-    }/*,
+    },
     async mounted() {
-        await this.load();
-    }*/
+        await this.load(3, true);
+        this.store.state.firstLoad = true;
+    }
 }
 </script>

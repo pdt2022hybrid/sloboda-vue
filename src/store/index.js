@@ -17,7 +17,7 @@ import { createStore } from 'vuex'
  * content: [ Todolist ... ]
  * 
  */
-const store = createStore({
+export default createStore({
     state: {
         todos: [
             {
@@ -50,9 +50,14 @@ const store = createStore({
             {
                 name: "Important",
                 id: 2
+            },
+            {
+                name: "Placeholders",
+                id: 3
             }
         ],
-        activeList: 1
+        activeList: 1,
+        firstLoad: false
         /* Old Format
         content: [
             {
@@ -97,28 +102,53 @@ const store = createStore({
         }
     },
     mutations: {
-
-        addList: function (state, name = '') {
+        createList: function (state, name = '') {
             let listId = state.lists.length + 1;
+            //If name is empty use default, if name already exists add (number)
+            let listName;
+            /*let listName = name === '' ? "My List #" + listId
+                : state.lists.filter(list => list.name === name)!==[] ? name + " (" + 2 + ")"
+                : name;*/
+            if(name === '') listName = "My List #" + listId;
+            else if(state.lists.filter(list => list.name === name) !== []) {
+                for(let i = 2; i < 1000; i++) { //Limit to 999
+                    if(state.lists.filter(list => list.name === name + " ("+i+")") !== []) continue;
+                    listName = name + " ("+i+")"; break;
+                }
+            } else listName = name;
             state.lists.push({
-                name: (name == '' ? "My List #" + listId : name),
+                name: listName,
                 id: listId
             });
             console.log("Added list #" + listId);
             return listId;
         },
-        setList: function (state, todolist) {
-            state.todos = todolist
+        setList: function (state, { id, list }) {
+            state.todos = state.todos.filter(obj => obj.listId !== id);
+            for(let obj of list) {
+                state.todos.push({
+                    title: obj.title,
+                    description: obj.description,
+                    id: state.todos.filter(obj => obj.listId === id).length + 1,
+                    listId: id,
+                    completed: obj.completed
+                });
+            }
         },
         deleteList: function (state, listId) {
+            state.todos = state.todos.filter(obj => obj.listId !== listId);
             state.lists = state.lists.filter(list => list.id !== listId);
         },
-        add: function (state, list, title, desc = '', completed = false) {
+        setTodos: function (state, todolist) {
+            state.todos = todolist
+        },
+        add: function (state, { list , title, desc = '', completed = false }) {
             if(title == '') return;
+            let currentList = state.todos.filter(obj => obj.listId === list);
             state.todos.push({
                 title: title,
                 description: desc,
-                id: state.todos.length + 1,
+                id: currentList.length + 1,
                 listId: list,
                 completed: completed
             });
@@ -126,7 +156,7 @@ const store = createStore({
         completed: function (state, item) {
             let arr = [];
             for(let obj of state.todos) {
-                if(obj == item) obj.completed = !obj.completed; // toggle
+                if(obj === item) obj.completed = !obj.completed; // toggle
                 arr.push(obj);
             }
             state.todos = arr;
@@ -136,7 +166,7 @@ const store = createStore({
             state.todos = state.todos.filter(obj => obj !== item);
             for(let obj of state.todos) { // Update IDs
                 let index = state.todos.indexOf(obj)
-                if(index + 1 != obj.id) {
+                if(index + 1 !== obj.id) {
                     obj.id = state.todos.indexOf(obj) + 1;
                     state.todos[index] = obj;
                 }
@@ -182,5 +212,3 @@ const store = createStore({
 
     }
 })
-
-export default store
