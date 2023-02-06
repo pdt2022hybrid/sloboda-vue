@@ -23,7 +23,7 @@
             <div v-for="value in list" :key="value.id">
                 <div v-if="value.listId === this.activeListId && value.completed === this.completedList" class="innerDiv container">
                     <div class="row">
-                        <div class="col">
+                        <div @click="this.edit(value)" class="col" style="cursor: pointer;">
                             <h3 class="innerText">{{ value.id }}: {{ value.title }}</h3>
                             <h5 v-if="value.description != ''" class="innerText user">{{ value.description }}</h5>
                         </div>
@@ -35,14 +35,21 @@
                             <i v-else @click="this.store.commit('completed', value);" class="check-true bi bi-check-circle-fill"></i>
                         </div>
                     </div>
+                    <PopupComponent
+                        v-if="this.editing.state && this.editing.todo === value"
+                        :listId="this.activeListId.value"
+                        :item="value"
+                        @exit="this.editing.state=false"
+                        @save="function a(t, d) { if(t !== '') value.title = t; value.description = d; }"
+                    />
                 </div>
             </div>
         </div>
     </div>
-    
 </template>
 
 <style>
+
 .outerDiv {
   padding: 30px 0;
   margin-top: 20px;
@@ -61,7 +68,7 @@
 
 .innerDiv {
     padding: 5px 50px 5px 0;
-    width: 80%;
+    width: 85%;
     border-radius: 12px;
     color: #fff;
     flex-direction: row;
@@ -118,9 +125,13 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import axios from 'axios'
+import PopupComponent from '@/components/PopupComponent.vue'
 
 export default {
     name: 'ListComponent',
+    components: {
+      PopupComponent
+    },
     props: {
         completedList: Boolean
     },
@@ -130,12 +141,17 @@ export default {
             activeListId: computed(() => this.store.state.activeList),
             list: computed(() => this.store.state.todos),
             input: '',
-            inputDesc: ''
+            inputDesc: '',
+            editing: {
+                state: false,
+                type: "item",
+                todo: {}
+            }
         }
     },
     methods: {
         load: async function(list, start = false, url = "https://jsonplaceholder.typicode.com/todos") { //optional url
-            if(start && this.store.state.firstLoad) return;
+            if(start && this.store.state.firstLoaded) return;
             try {
                 await axios.get(url).then( (result) => {
                     //let arr = [];
@@ -157,11 +173,14 @@ export default {
         add: function(title, desc = '') {
             this.store.commit('add', { list: this.activeListId, title: title, desc: desc, completed: false });
             this.input = ''; this.inputDesc = '';
+        },
+        edit: function(todo) {
+            this.editing = {state: true, todo: todo}
         }
     },
     async mounted() {
         await this.load(3, true);
-        this.store.state.firstLoad = true;
+        this.store.state.firstLoaded = true;
     }
 }
 </script>

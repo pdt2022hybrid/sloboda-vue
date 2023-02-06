@@ -57,7 +57,7 @@ export default createStore({
             }
         ],
         activeList: 1,
-        firstLoad: false
+        firstLoaded: false
         /* Old Format
         content: [
             {

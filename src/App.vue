@@ -77,7 +77,7 @@ export default {
 } .subtitle {
   font-size: 45px;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 24.4px;
   color: #5c6774 !important;
 }
 
