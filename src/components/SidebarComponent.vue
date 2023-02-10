@@ -1,7 +1,7 @@
 <template>
   <div class="top">
-    <img alt="Vue logo" src="../assets/logo.png">
-  <h1><b>TODO Lists</b></h1>
+    <a target="_blank" href="https://github.com/pdt2022hybrid/sloboda-vue"><img alt="Vue logo" src="../assets/logo.png"></a>
+    <h1><b>TODO Lists</b></h1>
   </div>
   <div @click="this.store.commit('createList');" class="add container">
     <div class="row">
